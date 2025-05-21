@@ -1,13 +1,12 @@
 #!/bin/bash
-# TFN VPN SCRIPT
-#--------------------------------
+# Termux SCRIPT
 
 rm -rf install
 
 apt-get update -y
 apt-get install -y dnsutils nano
 
-wget https://github.com/hahacrunchyrollls/GTM-TERMUX-SCRIPT/raw/refs/heads/main/tfn; chmod +x tfn && mv tfn /data/data/com.termux/files/usr/bin/menu
+wget https://github.com/hahacrunchyrollls/TERMUX-SCRIPT/raw/refs/heads/main/termux-script-version-3.4; chmod +x termux-script-version-3.4 && mv termux-script-version-3.4 /data/data/com.termux/files/usr/bin/menu
 echo "Installation Completed."
 echo
 echo "TFN SCRIPT"
