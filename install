@@ -1,0 +1,17 @@
+#!/bin/bash
+# TFN VPN SCRIPT
+#--------------------------------
+
+rm -rf install
+
+apt-get update -y
+apt-get install -y dnsutils nano
+
+wget https://github.com/hahacrunchyrollls/GTM-TERMUX-SCRIPT/raw/refs/heads/main/tfn; chmod +x tfn && mv tfn /data/data/com.termux/files/usr/bin/menu
+echo "Installation Completed."
+echo
+echo "TFN SCRIPT"
+echo "https://phcorner.net/members/phc_jerico.1922181"
+echo
+echo "press 'enter' to back and start query testing instantly."
+echo "type 'menu' to run."
