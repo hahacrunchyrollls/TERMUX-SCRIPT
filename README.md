@@ -12,7 +12,7 @@ https://f-droid.org/repo/com.termux_1020.apk
 pkg install -y curl && curl -sL https://github.com/hahacrunchyrollls/TERMUX-SCRIPT/raw/refs/heads/main/install | bash
 ```
 
-## TO OPEN AGAIN TYPE:
+## TO OPEN MAIN MENU:
 ```
 menu
 ```
