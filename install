@@ -4,6 +4,7 @@
 rm -rf install
 
 apt-get update -y
+apt-get install wget
 apt-get install -y dnsutils nano
 
 wget https://github.com/hahacrunchyrollls/TERMUX-SCRIPT/raw/refs/heads/main/termux-script-version-3.4; chmod +x termux-script-version-3.4 && mv termux-script-version-3.4 /data/data/com.termux/files/usr/bin/menu
