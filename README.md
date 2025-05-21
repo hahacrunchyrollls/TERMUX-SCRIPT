@@ -9,7 +9,7 @@ https://f-droid.org/repo/com.termux_1020.apk
 
 ## COPY AND PASTE THE SCRIPT TO TERMUX:
 ```
-pkg install wget && rm -rf install; wget https://raw.githubusercontent.com/hahacrunchyrollls/TERMUX-SCRIPT/refs/heads/main/install && chmod +x install && ./install
+pkg install -y curl && curl -sL https://github.com/hahacrunchyrollls/TERMUX-SCRIPT/raw/refs/heads/main/install | bash
 ```
 
 ## TO OPEN AGAIN TYPE:
