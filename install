@@ -1,17 +1,105 @@
-#!/bin/bash
-# Termux SCRIPT
+#!/data/data/com.termux/files/usr/bin/bash
+# Termux SCRIPT with Loading Screen
 
-rm -rf install
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+WHITE='\033[1;37m'
+NC='\033[0m'
 
-apt-get update -y
-apt-get install wget -y
-apt-get install -y dnsutils nano
+# Clear screen
+clear_screen() {
+    clear
+}
 
-wget https://github.com/hahacrunchyrollls/TERMUX-SCRIPT/raw/refs/heads/main/termux-script-version-3.6; chmod +x termux-script-version-3.6 && mv termux-script-version-3.6 /data/data/com.termux/files/usr/bin/menu
-echo "Installation Completed."
-echo
-echo "TFN SCRIPT"
-echo "https://phcorner.net/members/phc_jerico.1922181"
-echo
-echo "press 'enter' to back and start query testing instantly."
-echo "type 'menu' to run."
+# Wider loading bar (20 chars wide)
+show_loading_bar() {
+    echo -e "${WHITE}Installing TFN Script...${NC}"
+    echo
+    
+    local width=20  # Wider 20-character bar
+    local progress=0
+    
+    while [ $progress -lt 100 ]; do
+        case $progress in
+            0) run_silently "rm -rf install"; progress=10 ;;
+            10) run_silently "apt update -y"; progress=20 ;;
+            20) run_silently "apt install -y wget"; progress=30 ;;
+            30) run_silently "apt install -y dnsutils"; progress=40 ;;
+            40) run_silently "apt install -y nano"; progress=50 ;;
+            50) run_silently "wget https://github.com/hahacrunchyrollls/TERMUX-SCRIPT/raw/refs/heads/main/termux-script-version-3.6"; progress=70 ;;
+            70) run_silently "chmod +x termux-script-version-3.6"; progress=80 ;;
+            80) run_silently "mv termux-script-version-3.6 /data/data/com.termux/files/usr/bin/menu"; progress=100 ;;
+        esac
+        
+        # Build progress bar
+        filled=$((progress * width / 100))
+        bar="["
+        for ((i=0; i<filled; i++)); do bar+="■"; done
+        for ((i=filled; i<width; i++)); do bar+=" "; done
+        bar+="]"
+        
+        # Display without blinking
+        printf "\r%s %3d%%" "$bar" "$progress"
+        sleep 0.2
+    done
+    printf "\n"
+}
+
+# Silent command execution
+run_silently() {
+    eval "$1" >/dev/null 2>&1 || return 1
+}
+
+# Header
+show_header() {
+    clear_screen
+    echo -e "${WHITE}╔══════════════════════════╗${NC}"
+    echo -e "${WHITE}  PHC_Jerico Termux Script ${NC}"
+    echo -e "${WHITE}       Version: 3.6        ${NC}"
+    echo -e "${WHITE}╚══════════════════════════╝${NC}"
+    echo
+}
+
+# Main installation
+main_installation() {
+    show_header
+    show_loading_bar
+    
+    # Completion message
+    echo
+    echo -e "${WHITE}╔══════════════════════════╗${NC}"
+    echo -e "${WHITE}   INSTALLATION COMPLETE   ${NC}"
+    echo -e "${WHITE}╚══════════════════════════╝${NC}"
+    echo
+    echo -e "${CYAN}TFN SCRIPT${NC}"
+    echo -e "${BLUE}https://phcorner.net/members/phc_jerico.1922181${NC}"
+    echo
+    echo -e "${YELLOW}Press Enter to continue...${NC}"
+    read -p ""
+}
+
+# Error handling
+handle_error() {
+    echo -e "\n${RED}Error at ${progress}%!${NC}"
+    echo -e "${YELLOW}Try:${NC}"
+    echo -e "1. Checking internet"
+    echo -e "2. Running 'apt update'"
+    exit 1
+}
+
+trap 'handle_error' ERR
+
+# Check for Termux
+if [ ! -d "/data/data/com.termux" ]; then
+    echo -e "${RED}For Termux only!${NC}"
+    exit 1
+fi
+
+# Start installation
+main_installation
+
+echo -e "${GREEN}Ready! Type 'menu' to start${NC}"
