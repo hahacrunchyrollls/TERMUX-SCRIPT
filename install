@@ -1,8 +1,6 @@
 #!/data/data/com.termux/files/usr/bin/bash
 # Termux SCRIPT with Loading Screen
 
-set -e
-
 # Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -12,8 +10,7 @@ CYAN='\033[0;36m'
 WHITE='\033[1;37m'
 NC='\033[0m'
 
-VER="3.7"
-PROGRESS=0
+VER="3.6"
 
 # Clear screen
 clear_screen() {
@@ -24,30 +21,31 @@ clear_screen() {
 show_loading_bar() {
     echo -e "${WHITE}Installing Termux Script...${NC}"
     echo
-
+    
     local width=20  # Wider 20-character bar
-
-    while [ $PROGRESS -lt 100 ]; do
-        case $PROGRESS in
-            0) run_silently "rm -rf install"; PROGRESS=10 ;;
-            10) run_silently "apt update -y"; PROGRESS=20 ;;
-            20) run_silently "apt install -y wget"; PROGRESS=30 ;;
-            30) run_silently "apt install -y dnsutils"; PROGRESS=40 ;;
-            40) run_silently "apt install -y nano"; PROGRESS=50 ;;
-            50) run_silently "wget https://github.com/hahacrunchyrollls/TERMUX-SCRIPT/raw/refs/heads/main/termux-script-version-$VER"; PROGRESS=70 ;;
-            70) run_silently "chmod +x termux-script-version-$VER"; PROGRESS=80 ;;
-            80) run_silently "mv termux-script-version-$VER /data/data/com.termux/files/usr/bin/menu"; PROGRESS=100 ;;
+    local progress=0
+    
+    while [ $progress -lt 100 ]; do
+        case $progress in
+            0) run_silently "rm -rf install"; progress=10 ;;
+            10) run_silently "apt update -y"; progress=20 ;;
+            20) run_silently "apt install -y wget"; progress=30 ;;
+            30) run_silently "apt install -y dnsutils"; progress=40 ;;
+            40) run_silently "apt install -y nano"; progress=50 ;;
+            50) run_silently "wget https://github.com/hahacrunchyrollls/TERMUX-SCRIPT/raw/refs/heads/main/termux-script-version-$VER"; progress=70 ;;
+            70) run_silently "chmod +x termux-script-version-$VER"; progress=80 ;;
+            80) run_silently "mv termux-script-version-$VER /data/data/com.termux/files/usr/bin/menu"; progress=100 ;;
         esac
-
+        
         # Build progress bar
-        filled=$((PROGRESS * width / 100))
+        filled=$((progress * width / 100))
         bar="["
         for ((i=0; i<filled; i++)); do bar+="■"; done
         for ((i=filled; i<width; i++)); do bar+=" "; done
         bar+="]"
-
+        
         # Display without blinking
-        printf "\r%s %3d%%" "$bar" "$PROGRESS"
+        printf "\r%s %3d%%" "$bar" "$progress"
         sleep 0.2
     done
     printf "\n"
@@ -55,7 +53,7 @@ show_loading_bar() {
 
 # Silent command execution
 run_silently() {
-    eval "$1" >/dev/null 2>&1 || handle_error
+    eval "$1" >/dev/null 2>&1 || return 1
 }
 
 # Header
@@ -63,7 +61,7 @@ show_header() {
     clear_screen
     echo -e "${WHITE}╔══════════════════════════╗${NC}"
     echo -e "${WHITE}  PHC_Jerico Termux Script ${NC}"
-    echo -e "${WHITE}       Version: 3.6        ${NC}"
+    echo -e "${WHITE}       Version: $VER        ${NC}"
     echo -e "${WHITE}╚══════════════════════════╝${NC}"
     echo
 }
@@ -72,7 +70,7 @@ show_header() {
 main_installation() {
     show_header
     show_loading_bar
-
+    
     # Completion message
     echo
     echo -e "${WHITE}╔══════════════════════════╗${NC}"
@@ -88,7 +86,7 @@ main_installation() {
 
 # Error handling
 handle_error() {
-    echo -e "\n${RED}Error at ${PROGRESS}%!${NC}"
+    echo -e "\n${RED}Error at ${progress}%!${NC}"
     echo -e "${YELLOW}Try:${NC}"
     echo -e "1. Checking internet"
     echo -e "2. Running 'apt update'"
