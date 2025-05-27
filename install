@@ -10,7 +10,7 @@ CYAN='\033[0;36m'
 WHITE='\033[1;37m'
 NC='\033[0m'
 
-VER="3.6"
+VER="3.7"
 
 # Clear screen
 clear_screen() {
