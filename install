@@ -17,7 +17,7 @@ clear_screen() {
 
 # Wider loading bar (20 chars wide)
 show_loading_bar() {
-    echo -e "${WHITE}Installing TFN Script...${NC}"
+    echo -e "${WHITE}Installing Termux Script...${NC}"
     echo
     
     local width=20  # Wider 20-character bar
