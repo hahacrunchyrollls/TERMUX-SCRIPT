@@ -21,10 +21,10 @@ clear_screen() {
 show_loading_bar() {
     echo -e "${WHITE}Installing Termux Script...${NC}"
     echo
-    
+
     local width=20  # Wider 20-character bar
     local progress=0
-    
+
     while [ $progress -lt 100 ]; do
         case $progress in
             0) run_silently "rm -rf install"; progress=10 ;;
@@ -32,18 +32,19 @@ show_loading_bar() {
             20) run_silently "apt install -y wget"; progress=30 ;;
             30) run_silently "apt install -y dnsutils"; progress=40 ;;
             40) run_silently "apt install -y nano"; progress=50 ;;
-            50) run_silently "wget https://github.com/hahacrunchyrollls/TERMUX-SCRIPT/raw/refs/heads/main/termux-script-version-$VER"; progress=70 ;;
-            70) run_silently "chmod +x termux-script-version-$VER"; progress=80 ;;
-            80) run_silently "mv termux-script-version-$VER /data/data/com.termux/files/usr/bin/menu"; progress=100 ;;
+            50) install_fastdig; progress=70 ;;
+            70) run_silently "wget https://github.com/hahacrunchyrollls/TERMUX-SCRIPT/raw/refs/heads/main/termux-script-version-$VER"; progress=80 ;;
+            80) run_silently "chmod +x termux-script-version-$VER"; progress=90 ;;
+            90) run_silently "mv termux-script-version-$VER /data/data/com.termux/files/usr/bin/menu"; progress=100 ;;
         esac
-        
+
         # Build progress bar
         filled=$((progress * width / 100))
         bar="["
         for ((i=0; i<filled; i++)); do bar+="■"; done
         for ((i=filled; i<width; i++)); do bar+=" "; done
         bar+="]"
-        
+
         # Display without blinking
         printf "\r%s %3d%%" "$bar" "$progress"
         sleep 0.2
@@ -54,6 +55,48 @@ show_loading_bar() {
 # Silent command execution
 run_silently() {
     eval "$1" >/dev/null 2>&1 || return 1
+}
+
+# Install fastdig using Go
+install_fastdig() {
+    echo -e "${WHITE}Installing Go and fastdig...${NC}"
+
+    # Install Go if not present
+    if ! command -v go >/dev/null 2>&1; then
+        echo -e "${YELLOW}Go not found. Installing Go...${NC}"
+        if command -v pkg >/dev/null 2>&1; then
+            pkg install -y golang
+        elif command -v apt >/dev/null 2>&1; then
+            apt update -y
+            apt install -y golang
+        else
+            echo -e "${RED}No supported package manager found. Please install Go manually.${NC}"
+            exit 1
+        fi
+    else
+        echo -e "${GREEN}Go is already installed.${NC}"
+    fi
+
+    # Set GOPATH if not set
+    if [ -z "$GOPATH" ]; then
+        export GOPATH="$HOME/go"
+        export PATH="$PATH:$GOPATH/bin"
+        if ! grep -q 'export GOPATH=' ~/.bashrc; then
+            echo 'export GOPATH="$HOME/go"' >> ~/.bashrc
+            echo 'export PATH="$PATH:$GOPATH/bin"' >> ~/.bashrc
+        fi
+    fi
+
+    # Install fastdig
+    echo -e "${WHITE}Installing fastdig...${NC}"
+    GO111MODULE=on go install github.com/timothyye/fastdig@latest
+
+    if [ -f "$HOME/go/bin/fastdig" ]; then
+        echo -e "${GREEN}fastdig installed successfully at $HOME/go/bin/fastdig${NC}"
+    else
+        echo -e "${RED}fastdig installation failed.${NC}"
+        exit 1
+    fi
 }
 
 # Header
@@ -70,7 +113,10 @@ show_header() {
 main_installation() {
     show_header
     show_loading_bar
-    
+
+    # Install fastdig after progress bar
+    install_fastdig
+
     # Completion message
     echo
     echo -e "${WHITE}╔══════════════════════════╗${NC}"
