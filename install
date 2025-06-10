@@ -65,10 +65,10 @@ install_fastdig() {
     if ! command -v go >/dev/null 2>&1; then
         echo -e "${YELLOW}Go not found. Installing Go...${NC}"
         if command -v pkg >/dev/null 2>&1; then
-            pkg install -y golang
+            pkg install -y golang || { echo -e "${RED}Failed to install Go.${NC}"; exit 1; }
         elif command -v apt >/dev/null 2>&1; then
             apt update -y
-            apt install -y golang
+            apt install -y golang || { echo -e "${RED}Failed to install Go.${NC}"; exit 1; }
         else
             echo -e "${RED}No supported package manager found. Please install Go manually.${NC}"
             exit 1
@@ -77,22 +77,24 @@ install_fastdig() {
         echo -e "${GREEN}Go is already installed.${NC}"
     fi
 
-    # Set GOPATH if not set
-    if [ -z "$GOPATH" ]; then
-        export GOPATH="$HOME/go"
-        export PATH="$PATH:$GOPATH/bin"
-        if ! grep -q 'export GOPATH=' ~/.bashrc; then
-            echo 'export GOPATH="$HOME/go"' >> ~/.bashrc
-            echo 'export PATH="$PATH:$GOPATH/bin"' >> ~/.bashrc
-        fi
+    # Set GOPATH and PATH for current session
+    export GOPATH="${HOME}/go"
+    export PATH="$PATH:$GOPATH/bin"
+
+    # Persist GOPATH and PATH if not already in .bashrc
+    if ! grep -q 'export GOPATH=' ~/.bashrc; then
+        echo 'export GOPATH="$HOME/go"' >> ~/.bashrc
+        echo 'export PATH="$PATH:$GOPATH/bin"' >> ~/.bashrc
     fi
 
     # Install fastdig
     echo -e "${WHITE}Installing fastdig...${NC}"
     GO111MODULE=on go install github.com/timothyye/fastdig@latest
 
-    if [ -f "$HOME/go/bin/fastdig" ]; then
-        echo -e "${GREEN}fastdig installed successfully at $HOME/go/bin/fastdig${NC}"
+    # Use go env to get the actual bin path
+    FASTDIG_BIN="$(go env GOPATH)/bin/fastdig"
+    if [ -f "$FASTDIG_BIN" ]; then
+        echo -e "${GREEN}fastdig installed successfully at $FASTDIG_BIN${NC}"
     else
         echo -e "${RED}fastdig installation failed.${NC}"
         exit 1
