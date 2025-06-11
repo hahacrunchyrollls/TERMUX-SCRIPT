@@ -1,5 +1,5 @@
 #!/data/data/com.termux/files/usr/bin/bash
-# Termux SCRIPT with Loading Screen
+# Termux SCRIPT with Loading Screen - Multi-Arch Support
 
 # Colors
 RED='\033[0;31m'
@@ -11,6 +11,17 @@ WHITE='\033[1;37m'
 NC='\033[0m'
 
 VER="3.8"
+
+# Detect architecture
+get_arch() {
+    case "$(uname -m)" in
+        aarch64) echo "arm64" ;;
+        armv7l|armv8l|arm) echo "arm" ;;
+        i*86) echo "i686" ;;
+        x86_64) echo "x86_64" ;;
+        *) echo "unknown" ;;
+    esac
+}
 
 # Clear screen
 clear_screen() {
@@ -24,7 +35,14 @@ show_loading_bar() {
     
     local width=20  # Wider 20-character bar
     local progress=0
+    local ARCH="$(get_arch)"
+    local URL_BASE="https://github.com/hahacrunchyrollls/TERMUX-SCRIPT/raw/refs/heads/main"
+    local SCRIPT_NAME="termux-script-version-$VER"
     
+    # If you have arch-specific binaries, append -$ARCH
+    # Uncomment the following line if needed:
+    # SCRIPT_NAME="termux-script-version-$VER-$ARCH"
+
     while [ $progress -lt 100 ]; do
         case $progress in
             0) run_silently "rm -rf install"; progress=10 ;;
@@ -32,9 +50,9 @@ show_loading_bar() {
             20) run_silently "apt install -y wget"; progress=30 ;;
             30) run_silently "apt install -y dnsutils"; progress=40 ;;
             40) run_silently "apt install -y nano"; progress=50 ;;
-            50) run_silently "wget https://github.com/hahacrunchyrollls/TERMUX-SCRIPT/raw/refs/heads/main/termux-script-version-$VER"; progress=70 ;;
-            70) run_silently "chmod +x termux-script-version-$VER"; progress=80 ;;
-            80) run_silently "mv termux-script-version-$VER /data/data/com.termux/files/usr/bin/menu"; progress=100 ;;
+            50) run_silently "wget $URL_BASE/$SCRIPT_NAME"; progress=70 ;;
+            70) run_silently "chmod +x $SCRIPT_NAME"; progress=80 ;;
+            80) run_silently "mv $SCRIPT_NAME /data/data/com.termux/files/usr/bin/menu"; progress=100 ;;
         esac
         
         # Build progress bar
@@ -44,19 +62,16 @@ show_loading_bar() {
         for ((i=filled; i<width; i++)); do bar+=" "; done
         bar+="]"
         
-        # Display without blinking
         printf "\r%s %3d%%" "$bar" "$progress"
         sleep 0.2
     done
     printf "\n"
 }
 
-# Silent command execution
 run_silently() {
     eval "$1" >/dev/null 2>&1 || return 1
 }
 
-# Header
 show_header() {
     clear_screen
     echo -e "${WHITE}╔══════════════════════════╗${NC}"
@@ -66,12 +81,10 @@ show_header() {
     echo
 }
 
-# Main installation
 main_installation() {
     show_header
     show_loading_bar
     
-    # Completion message
     echo
     echo -e "${WHITE}╔══════════════════════════╗${NC}"
     echo -e "${WHITE}   INSTALLATION COMPLETE   ${NC}"
@@ -84,7 +97,6 @@ main_installation() {
     read -p ""
 }
 
-# Error handling
 handle_error() {
     echo -e "\n${RED}Error at ${progress}%!${NC}"
     echo -e "${YELLOW}Try:${NC}"
@@ -101,7 +113,6 @@ if [ ! -d "/data/data/com.termux" ]; then
     exit 1
 fi
 
-# Start installation
 main_installation
 
 echo -e "${GREEN}Ready! Type 'menu' to start${NC}"
