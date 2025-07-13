@@ -15,30 +15,42 @@ VER="4.0"
 # Detect architecture
 get_arch() {
     case "$(uname -m)" in
-        aarch64) echo "arm64" ;;
+        aarch64) echo "aarch64" ;;
+        x86_64) echo "x86_64" ;;
         armv7l|armv8l|arm) echo "arm" ;;
         i*86) echo "i686" ;;
-        x86_64) echo "x86_64" ;;
         *) echo "unknown" ;;
     esac
 }
 
-# Clear screen
+# Check for supported architecture FIRST
+ARCH_TYPE="$(get_arch)"
+if [[ "$ARCH_TYPE" != "aarch64" && "$ARCH_TYPE" != "x86_64" ]]; then
+    echo -e "${RED}Unsupported architecture: $ARCH_TYPE${NC}"
+    echo -e "${YELLOW}Please download Termux for architecture: aarch64 or x86_64${NC}"
+    exit 1
+fi
+
+# Check for Termux
+if [ ! -d "/data/data/com.termux" ]; then
+    echo -e "${RED}This script is for Termux only!${NC}"
+    exit 1
+fi
+
 clear_screen() {
     clear
 }
 
-# Wider loading bar (20 chars wide)
 show_loading_bar() {
     echo -e "${WHITE}Installing Termux Script...${NC}"
     echo
-    
-    local width=20  # Wider 20-character bar
+
+    local width=20
     local progress=0
     local ARCH="$(get_arch)"
     local URL_BASE="https://github.com/hahacrunchyrollls/TERMUX-SCRIPT/raw/refs/heads/main"
     local SCRIPT_NAME="termux-script-version-$VER"
-    
+
     # If you have arch-specific binaries, append -$ARCH
     # Uncomment the following line if needed:
     # SCRIPT_NAME="termux-script-version-$VER-$ARCH"
@@ -54,14 +66,13 @@ show_loading_bar() {
             70) run_silently "chmod +x $SCRIPT_NAME"; progress=80 ;;
             80) run_silently "mv $SCRIPT_NAME /data/data/com.termux/files/usr/bin/menu"; progress=100 ;;
         esac
-        
-        # Build progress bar
+
         filled=$((progress * width / 100))
         bar="["
         for ((i=0; i<filled; i++)); do bar+="■"; done
         for ((i=filled; i<width; i++)); do bar+=" "; done
         bar+="]"
-        
+
         printf "\r%s %3d%%" "$bar" "$progress"
         sleep 0.2
     done
@@ -84,7 +95,7 @@ show_header() {
 main_installation() {
     show_header
     show_loading_bar
-    
+
     echo
     echo -e "${WHITE}╔══════════════════════════╗${NC}"
     echo -e "${WHITE}   INSTALLATION COMPLETE   ${NC}"
@@ -106,12 +117,6 @@ handle_error() {
 }
 
 trap 'handle_error' ERR
-
-# Check for Termux
-if [ ! -d "/data/data/com.termux" ]; then
-    echo -e "${RED}For Termux only!${NC}"
-    exit 1
-fi
 
 main_installation
 
