@@ -1,5 +1,5 @@
 #!/data/data/com.termux/files/usr/bin/bash
-# Termux SCRIPT with Loading Screen - Multi-Arch Support
+# Termux SCRIPT
 
 # Colors
 RED='\033[0;31m'
@@ -23,7 +23,7 @@ get_arch() {
     esac
 }
 
-# Check for supported architecture FIRST
+# Check for supported architecture
 ARCH_TYPE="$(get_arch)"
 if [[ "$ARCH_TYPE" != "aarch64" && "$ARCH_TYPE" != "x86_64" ]]; then
     echo -e "${RED}Unsupported architecture: $ARCH_TYPE${NC}"
